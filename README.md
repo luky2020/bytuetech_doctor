@@ -1,12 +1,27 @@
-＃bytuetech_doctor
+# 为了智能化运维努力 #
+>本程序会自动安装zabbix服务端以及agent端，并修改其相关配置文件。
+>本程序具备监控项的自动发现及智能匹配功能，只需要导入模板后配置自发现规则即可。
 
-*注意：yum源的下载需要进入yum目录里，点击【repo.zabbix.com.zip】，然后点击【download】，请自行替换clone下载到本地的文件。
+##1. 将程序包上传至服务器任意路径（建议/opt/software/下）
+##2. 解压程序包 
+`unzip bytuetech_doctor-*.zip`
+##3.修改hosts文件，根据实际项目情况增加客户端agent的登录信息,举例如下
 
-测试阶段第一版
-1.首先安装SERVER端
-将安装包拷贝至/opt/software/下
-2.执行安装脚本(根据您的实际情况更改SERVER服务器的IP地址)
-cd /opt/software/bytuetech_doctor/
-sh install.sh 10.0.0.22
-3.批量安装客户端agent
-  
+```# 请严格按照规定格式填写如下信息
+# IP地址 SSH端口 SSH登录用户 SSH登录用户密码 root密码（禁止root远程登录的服务器）
+#如 192.168.0.2 13666 widgetdo hello_widgetdo hello_root
+# IP地址 SSH端口 root root密码 （root可以远程登录的服务器）
+#如 192.168.0.1 22 root hello123
+10.10.1.213 13511 widgetdo h2&23sq(dG pxe#W2D2017
+10.10.1.217 13511 root  pxe2#W2D2017
+```
+##4.执行安装程序（需要输入服务端的IP地址），举例如下
+`sh install.sh 10.10.1.66`
+>以下自动化功能正在开发，采用python创建机器人:\
+智能自检、发现问题后自动安装依赖包及修改配置;\
+智能配置自发现规则；\
+智能配置报警；
+>
+##5.登录WEB页面，通过自检程序，使用浏览器访问 举例如下（根据实际情况填写信息，默认数据库用户密码都是zabbix）
+`http://10.10.1.66/zabbix/setup.php`
+##6.登录简书查看自发现规则及报警等最后配置
