@@ -1,13 +1,14 @@
 #!/bin/bash
-source /etc/profile
+source /etc/profile # 加载环境变量
+
 # 变量层定义 #
-## 获取服务端IP ##
-ServerIp=$1
+ServerIp=$1 # 获取服务端IP #
 Version_sys=`/usr/bin/cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'` # 判断操作系统选择相应的zabbix版本
+Path='pwd' # 获取程序所在路径 #
+
 
 # 获取客户端IP #
 AgentIp(){
-
 Agent_Ip_All=`/usr/sbin/ip a|grep -w "inet"|awk -F "/" '{print $1}'|awk '{print $2}'|grep -v "127.0.0.1"`
 for Agent_Ip in $Agent_Ip_All
 do
@@ -17,7 +18,6 @@ do
         break
     fi
 done
-
 }
 
 # 部署客户端 #
@@ -59,9 +59,6 @@ else
     echo "IP address error!" > /tmp/bytuetech_doctor_error
 fi
 }
-
-
-
 
 
 # 部署服务端 #
@@ -111,6 +108,35 @@ else
     exit
 fi
 
+}
+
+
+# 部署批量执行工具ansible #
+
+Ansible(){
+yum install ansible -y
+if [ $? -eq 0 ];then
+    sed -i 's/#host_key_checking = False/host_key_checking = False/' /etc/ansible/ansible.cfg # 不检查angent的SSH knows文件
+    echo "[bytuetech_doctor]" > /etc/ansible/hosts && grep -v "^#" $Path/hosts|awk '{print ""$1" ansible_ssh_port="$2" ansible_user="$3" ansible_ssh_pass=\""$4"\" ansible_su_pass=\""$5"\""}' >>/etc/ansible/hosts
+    cat > /etc/ansible/roles/bytuetech_doctor.yml << eof #编写 ansible 剧本文件
+- hosts: bytuetech_doctor
+  user: root
+  tasks:
+   - name: copy file
+     copy: src={{ item.src }} dest={{ item.dest }} mode='0755'
+     with_items:
+     - {src: "$Path/install.sh",
+       dest: "/etc/zabbix/"}
+     - {src: "$Path/script/",
+       dest: "/etc/zabbix/script"}
+     - {src: "$Path/conf/",
+       dest: "/etc/zabbix/zabbix_agentd.d/"}
+   - name: install zabbix
+     shell : sh /etc/zabbix/install.sh $ServerIp
+eof
+    ansible-playbook -S /etc/ansible/roles/bytuetech_doctor.yml > /
+
+fi
 
 }
 
