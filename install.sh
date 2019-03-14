@@ -134,7 +134,7 @@ if [ $? -eq 0 ];then
    - name: install zabbix
      shell : sh /etc/zabbix/install.sh $ServerIp
 eof
-    ansible-playbook -S /etc/ansible/roles/bytuetech_doctor.yml > /
+    ansible-playbook -S /etc/ansible/roles/bytuetech_doctor.yml
 
 fi
 
