@@ -1,12 +1,12 @@
 #!/bin/bash
 
-DB_path='/data/mariadb/bin'
+DB_path='/data/mariadb/bin/'
 # Definition monitoring variables #
 # Definition monitoring variables -01
 
 base(){
 :>/etc/zabbix/script/mysql/db_temp
-QPS=`$DB_path/mysqladmin status|cut -f9 -d":"|awk -F " " '{print $1}' |wc -l`
+QPS=`mysqladmin status|cut -f9 -d":"|awk -F " " '{print $1}' |wc -l`
 # Definition monitoring variables -02
 Questions=`$DB_path/mysqladmin status|cut -f4 -d":"|cut -f1 -d"S"|awk -F " " '{print $1}' |wc -l`
 # Definition monitoring variables -03
