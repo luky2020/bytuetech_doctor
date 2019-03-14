@@ -4,7 +4,7 @@ source /etc/profile # 加载环境变量
 # 变量层定义 #
 ServerIp=$1 # 获取服务端IP #
 Version_sys=`/usr/bin/cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'` # 判断操作系统选择相应的zabbix版本
-Path='pwd' # 获取程序所在路径 #
+Path=`pwd` # 获取程序所在路径 #
 
 
 # 获取客户端IP #
@@ -26,7 +26,7 @@ if [[ `AgentIp` != "" ]];then
     cat > /etc/yum.repos.d/zabbix_3.4.repo << eof
 [bytuetech]
 name=zabbix
-baseurl=http://$ServerIp/yum/repo.zabbix.com/zabbix/3.4/rhel/$Version_sys/x86_64/
+baseurl=http://$ServerIp/yum/zabbix/3.4/rhel/$Version_sys/x86_64/
 gpgcheck=0
 enabled=1
 eof
@@ -64,11 +64,11 @@ fi
 # 部署服务端 #
 ServerInstall(){
 ## 准备工作 安装HTTP 和数据库 ##
-yum install mariadb-server httpd ansible -y && systemctl restart mariadb httpd
+yum install mariadb-server httpd ansible -y && systemctl restart mariadb httpd && mkdir /etc/zabbix/
 if [ $? -eq 0 ];then
 
     ## 配置yum源 ##
-    unzip -o ./yum/repo.zabbix.com.zip -d /etc/zabbix
+    /usr/bin/scp -r yum/ /etc/zabbix/ /etc/zabbix
     ## 编写yum源的HTTP服务配置文件 ##
     cat > /etc/httpd/conf.d/yum.conf << eof
 Alias /yum /etc/zabbix/
@@ -83,7 +83,7 @@ eof
     cat > /etc/yum.repos.d/zabbix_3.4.repo << eof
 [bytuetech]
 name=zabbix
-baseurl=http://$ServerIp/yum/repo.zabbix.com/zabbix/3.4/rhel/$Version_sys/x86_64/
+baseurl=http://$ServerIp/yum/zabbix/3.4/rhel/$Version_sys/x86_64/
 gpgcheck=0
 enabled=1
 eof
