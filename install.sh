@@ -64,15 +64,15 @@ fi
 # 部署服务端 #
 ServerInstall(){
 ## 准备工作 安装HTTP 和数据库 ##
-yum install mariadb-server httpd ansible -y && systemctl restart mariadb httpd && mkdir /etc/zabbix/
+yum install mariadb-server httpd ansible -y && systemctl restart mariadb httpd && mkdir -p /etc/zabbix/
 if [ $? -eq 0 ];then
 
     ## 配置yum源 ##
-    /usr/bin/scp -r yum/ /etc/zabbix/ /etc/zabbix
+    /usr/bin/scp -r yum/ /etc/zabbix/
     ## 编写yum源的HTTP服务配置文件 ##
     cat > /etc/httpd/conf.d/yum.conf << eof
-Alias /yum /etc/zabbix/
-<Directory "/etc/zabbix/">
+Alias /yum /etc/zabbix/yum/
+<Directory "/etc/zabbix/yum/">
 Options Indexes FollowSymLinks
 AllowOverride none
 Require all granted
@@ -149,6 +149,12 @@ if [ $# -eq "$ARGS" ] && echo $1 |egrep -q '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\
     else
         if [[ `AgentIp` == $ServerIp ]];then
             ServerInstall
+            if [ $? -eq 0 ];then
+                Ansible
+            else
+                error!!
+            fi
+
         else
             AgentInstall
         fi
